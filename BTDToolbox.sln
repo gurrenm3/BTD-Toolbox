@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTDToolbox.Wpf", "BTDToolbox.Wpf\BTDToolbox.Wpf.csproj", "{20B0A675-6CCE-481C-A6B5-A6D5C801E5C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTDToolbox.Lib", "BTDToolbox.Lib\BTDToolbox.Lib.csproj", "{F878CD59-8717-4C72-949C-B66441C4FDC3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20B0A675-6CCE-481C-A6B5-A6D5C801E5C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B0A675-6CCE-481C-A6B5-A6D5C801E5C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B0A675-6CCE-481C-A6B5-A6D5C801E5C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B0A675-6CCE-481C-A6B5-A6D5C801E5C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F878CD59-8717-4C72-949C-B66441C4FDC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F878CD59-8717-4C72-949C-B66441C4FDC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F878CD59-8717-4C72-949C-B66441C4FDC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F878CD59-8717-4C72-949C-B66441C4FDC3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9560D85-7E31-4805-B3AC-9AA77D1898C4}
+	EndGlobalSection
+EndGlobal
