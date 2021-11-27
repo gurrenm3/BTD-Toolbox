@@ -3,10 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:BTDToolbox.Wpf.ViewModels"
+        xmlns:views="clr-namespace:BTDToolbox.Wpf.Views"
         xmlns:local="clr-namespace:BTDToolbox.Wpf.Windows"
         mc:Ignorable="d"
         ContentRendered="Window_ContentRendered"
-        Title="BTD Toolbox" Height="450" Width="800">
+        WindowStartupLocation="CenterScreen"
+        Title="BTD Toolbox" Height="550" Width="800">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:WelcomeViewModel}">
+            <views:WelcomeView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:NewProjectViewModel}">
+            <views:NewProjectView DataContext="{Binding}"/>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -18,6 +29,10 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+
+        <ContentControl Content="{Binding}"
+                        Grid.ColumnSpan="10"
+                        Grid.RowSpan="10"/>
 
         <ContentControl x:Name="popupPanel"
                         Grid.ColumnSpan="10"
