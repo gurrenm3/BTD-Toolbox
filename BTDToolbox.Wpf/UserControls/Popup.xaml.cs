@@ -5,6 +5,8 @@ using BTDToolbox.Wpf.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,6 +19,7 @@ namespace BTDToolbox.Wpf
     {
         private static Queue<Popup> queuedPopups = new Queue<Popup>();
         private PopupAction popupAction;
+        private bool popupButtonPressed = false;
 
         public Popup()
         {
@@ -64,6 +67,20 @@ namespace BTDToolbox.Wpf
                 buttonClickActions.InvokeAll();
         }
 
+        private async Task WaitForClose()
+        {
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (popupButtonPressed)
+                        break;
+
+                    Thread.Sleep(350);
+                }
+            });
+        }
+
         private static ContentControl GetPopupPanel()
         {
             if (MainWindow.Instance != null)
@@ -78,30 +95,31 @@ namespace BTDToolbox.Wpf
         public static void ShowWarning(string message) => ShowWarning(message, new PopupAction());
         public static void ShowWarning(string message, PopupAction popupAction)
         {
-            Show(message, popupAction, "Warning");
+            Show(message, "Warning", popupAction);
         }
 
 
         public static void ShowError(string message) => ShowError(message, new PopupAction());
         public static void ShowError(string message, PopupAction popupAction)
         {
-            Show(message, popupAction, "Error");
+            Show(message, "Error", popupAction);
         }
 
-        public static void Show(string message, string title = "Popup") => Show(message, new PopupAction(), title);
-        public static void Show(string message, Action okayClicked, string title = "Popup") => Show(message, new PopupAction(okayClicked), title);
-        public static void Show(string message, Action yesClicked, Action noClicked, string title = "Popup") => Show(message, new PopupAction(yesClicked, noClicked), title);
-        public static void Show(string message, PopupAction popupAction, string title = "Popup")
+        public static async Task Show(string message) => await Show(message, "", new PopupAction());
+        public static async Task Show(string message, string title) => await Show(message, title, new PopupAction());
+        public static async Task Show(string message, string title, Action okayClicked) => await Show(message, title, new PopupAction(okayClicked));
+        public static async Task Show(string message, string title, Action yesClicked, Action noClicked) => await Show(message, title, new PopupAction(yesClicked, noClicked));
+        public static async Task Show(string message, string title, PopupAction popupAction)
         {
             var popup = new Popup();
             popup.Init(message, title, popupAction);
             queuedPopups.Enqueue(popup);
             if (!runningPopups)
-                RunQueuedPopups();
+                await RunQueuedPopups();
         }
 
         static bool runningPopups = false;
-        private static void RunQueuedPopups()
+        private static async Task RunQueuedPopups()
         {
             if (queuedPopups.Count == 0)
             {
@@ -112,7 +130,9 @@ namespace BTDToolbox.Wpf
 
             var popup = queuedPopups.Dequeue();
             popup.ShowPopup();
+            popup.popupAction.OnAnyButtonPressed.Add(() => popup.popupButtonPressed = true);
             runningPopups = true;
+            await popup.WaitForClose();
         }
     }
 }

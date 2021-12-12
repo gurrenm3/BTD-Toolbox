@@ -6,10 +6,13 @@
              StartupUri="Windows/StartupWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <Brush x:Key="foregroundColor">Black</Brush>
+            <Brush x:Key="foregroundColor">White</Brush>
+            <Brush x:Key="backgroundColor">#FF2D2D2D</Brush>
+            <Brush x:Key="backgroundColor2">#FF262626</Brush>
+            <Brush x:Key="backgroundColor3">#FF262626</Brush>
             
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
+                <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="Orange" SecondaryColor="Lime" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

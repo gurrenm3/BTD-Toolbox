@@ -6,6 +6,10 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using BTDToolbox.Wpf.Windows;
 using BTDToolbox.Lib.Persistance;
+using BTDToolbox.Lib;
+using System.Diagnostics;
+using System;
+using System.IO;
 
 namespace BTDToolbox.Wpf.Views
 {
@@ -21,36 +25,35 @@ namespace BTDToolbox.Wpf.Views
 
         private void newProject_Button_Click(object sender, RoutedEventArgs e)
         {
-            SetWindowView<NewProjectViewModel>();
+            SetWindowView<NewProjectViewModel>();            
         }
 
-        private void openProject_Button_Click(object sender, RoutedEventArgs e)
+        private async void openProject_Button_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Toolbox Files | *.toolbox";
-            openFileDialog.Title = "Browse for project";
-            openFileDialog.Multiselect = false;
-            if (openFileDialog.ShowDialog().HasValue)
+            string defaultDir = $"{Environment.CurrentDirectory}\\Toolbox Projects";
+            Directory.CreateDirectory(defaultDir);
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Toolbox Files | *.toolbox";
+            ofd.Title = "Browse for project";
+            ofd.Multiselect = false;
+            ofd.InitialDirectory = defaultDir;
+            if (ofd.ShowDialog().HasValue)
             {
-                if (string.IsNullOrEmpty(openFileDialog.FileName))
+                if (string.IsNullOrEmpty(ofd.FileName))
                     return;
 
-                var project = ToolboxProject.LoadFromFile(openFileDialog.FileName);
-                MainWindow mainWindow = new MainWindow(project);
-                mainWindow.Show();
+                var project = ToolboxProject.LoadFromFile(ofd.FileName);
+                if (project == null)
+                    return;
+
+                new MainWindow(project).Show();
                 Window.GetWindow(this).Close();
             }
         }
 
-        private void continueWithoutCode_Button_MouseUp(object sender, MouseButtonEventArgs e)
+        private async void cloneProject_Button_Click(object sender, RoutedEventArgs e)
         {
-            new MainWindow().Show();
-            Window.GetWindow(this).Close();
-        }
-
-        private void cloneProject_Button_Click(object sender, RoutedEventArgs e)
-        {
-            Popup.Show("This feature hasn't been implimented yet.");
+            await Popup.Show("This feature hasn't been implimented yet.", "Not Implemented");
         }
 
         private void SetWindowView<T>() where T : IViewModel, new() => Window.GetWindow(this).ChangeView<T>();

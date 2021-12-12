@@ -7,17 +7,18 @@
         xmlns:views="clr-namespace:BTDToolbox.Wpf.Views"
         xmlns:local="clr-namespace:BTDToolbox.Wpf.Windows"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
-        Background="{DynamicResource MaterialDesignPaper}"
+        Background="{StaticResource backgroundColor2}"
+        Foreground="{StaticResource foregroundColor}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Title="BTD Toolbox" Height="450" Width="800">
+        Title="BTD Toolbox" Height="450" Width="800"
+        Loaded="Window_Loaded">
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewModels:JetModViewModel}">
             <views:JetModView DataContext="{Binding}"/>
@@ -35,7 +36,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TabControl x:Name="modsTabControl" Grid.ColumnSpan="3" Grid.RowSpan="3"/>
+        <TabControl x:Name="modsTabControl" Grid.ColumnSpan="3" Grid.RowSpan="3" Background="{StaticResource backgroundColor2}" BorderBrush="#FF929292"/>
 
         <ContentControl x:Name="popupPanel"
                         Grid.ColumnSpan="10"

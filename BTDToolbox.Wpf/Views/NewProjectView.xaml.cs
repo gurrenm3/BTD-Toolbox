@@ -12,6 +12,7 @@ using BTDToolbox.Lib.Persistance;
 using System.IO;
 using BTDToolbox.Lib.UI;
 using BTDToolbox.Wpf.Windows;
+using System.Diagnostics;
 
 namespace BTDToolbox.Wpf.Views
 {
@@ -20,6 +21,7 @@ namespace BTDToolbox.Wpf.Views
     /// </summary>
     public partial class NewProjectView : UserControl
     {
+        private GameInfo gameInfo;
         private List<NewProjectItem> projectTypes;
         private GameType selectedGame = GameType.None;
 
@@ -58,7 +60,7 @@ namespace BTDToolbox.Wpf.Views
             List<NewProjectItem> projectItems = new List<NewProjectItem>();
             projectItems.Add(new NewProjectItem("Map Mod", GameType.BloonsTD6, ModType.Map));
 
-            List<GameType> jetModGames = new List<GameType>() { GameType.BloonsTD5, GameType.BloonsTDB, GameType.BloonsMC };
+            List<GameType> jetModGames = new List<GameType>() { GameType.BloonsTD5, GameType.BloonsTDB, GameType.BloonsMC, GameType.BloonsTDB2 };
             projectItems.Add(new NewProjectItem("Jet Mod", jetModGames, ModType.Jet));
 
             return projectItems;
@@ -73,11 +75,17 @@ namespace BTDToolbox.Wpf.Views
             if (selectedGame == GameType.None)
                 return;
 
+            gameInfo = Settings.Instance.GetGameInfo(selectedGame);
             projPass_Grid.Visibility = selectedGame.HasJetFile() ? Visibility.Visible : Visibility.Hidden;
 
             bool isPassKnown = selectedGame == GameType.BloonsMC || selectedGame == GameType.BloonsTD5;
             jetPass_TextBox.IsReadOnly = isPassKnown ? true : false;
             jetPass_TextBox.Text = isPassKnown ? "Q%_{6#Px]]" : "";
+
+            projLocation_TextBox.Text = gameInfo.GetDefaultProjectDir();
+            projLocation_TextBox.Select(projLocation_TextBox.Text.Length, 0);
+            projLocation_TextBox.CaretIndex = projLocation_TextBox.Text.Length;
+            projLocation_TextBox.Focus();
 
             LoadAvailableModProjects();
         }
@@ -92,7 +100,6 @@ namespace BTDToolbox.Wpf.Views
 
                 ListBoxItem item = new ListBoxItem();
                 item.Content = projType.ItemName;
-                item.Foreground = Brushes.Black;
                 projTypesLB.Items.Add(item);
             }
         }
@@ -130,7 +137,7 @@ namespace BTDToolbox.Wpf.Views
             Window.GetWindow(this).ChangeView<WelcomeViewModel>();
         }
 
-        private void create_Button_Click(object sender, RoutedEventArgs e)
+        private async void create_Button_Click(object sender, RoutedEventArgs e)
         {
             if (GetSelectedGame() == GameType.None)
             {
@@ -152,6 +159,23 @@ namespace BTDToolbox.Wpf.Views
             {
                 Popup.ShowError("You need to give your project a name!");
             }
+            else if (!gameInfo.IsGameDirValid())
+            {
+                await Popup.Show($"The path for {selectedGame} has not been set. Please set the path to continue...", $"Select Path for {selectedGame}", async () =>
+                {
+                    string path = gameInfo.BrowseForGamePath();
+                    if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                    {
+                        await Popup.Show($"Did not get the path for {selectedGame}.", "No Path Selected.");
+                    }
+                    else
+                    {
+                        gameInfo.GamePath = new FileInfo(path).DirectoryName;
+                        Settings.Instance.Save();
+                        await Popup.Show($"The path for {selectedGame} was successfully set. You can now create your project.", "Game Path Set!");
+                    }
+                });
+            }
             else
             {
                 string filePath = projLocation_TextBox.Text + "\\" + projName_TextBox.Text;
@@ -160,7 +184,7 @@ namespace BTDToolbox.Wpf.Views
                 if (File.Exists(filePath))
                 {
                     var popupAction = new PopupAction(() => { OpenProject(filePath); }, () =>  {  return; });
-                    Popup.Show("A project with that name already exists. Do you want to replace it?", popupAction);
+                    await Popup.Show("A project with that name already exists. Do you want to replace it?", "Project already exists", popupAction);
                 }
                 else
                 {
@@ -174,8 +198,7 @@ namespace BTDToolbox.Wpf.Views
             ToolboxProject project = CreateToolboxProject(filePath);
             project.SaveToFile();
 
-            MainWindow mainWindow = new MainWindow(project);
-            mainWindow.Show();
+            new MainWindow(project).Show();
             Window.GetWindow(this).Close();
         }
 
@@ -195,9 +218,11 @@ namespace BTDToolbox.Wpf.Views
 
         private void browseLocation_Button_Click(object sender, RoutedEventArgs e)
         {
+            string defaultDir = $"{Environment.CurrentDirectory}\\Toolbox Projects";
+            Directory.CreateDirectory(defaultDir);
             FolderPicker folderPicker = new FolderPicker();
             folderPicker.Title = "Select save location";
-            folderPicker.InputPath = Environment.CurrentDirectory;
+            folderPicker.InputPath = defaultDir;
             if (folderPicker.ShowDialog().HasValue)
             {
                 projLocation_TextBox.Text = folderPicker.ResultPath;

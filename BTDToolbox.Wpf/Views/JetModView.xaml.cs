@@ -9,6 +9,12 @@ using ICSharpCode.SharpZipLib.Zip;
 using System.Diagnostics;
 using BTDToolbox.Extensions;
 using System;
+using BTDToolbox.Lib.Enums;
+using BTDToolbox.Wpf.Windows;
+using BTDToolbox.Wpf.ViewModels;
+using BTDToolbox.Lib.UI;
+using BTDToolbox.Lib;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BTDToolbox.Wpf.Views
 {
@@ -17,23 +23,27 @@ namespace BTDToolbox.Wpf.Views
     /// </summary>
     public partial class JetModView : UserControl
     {
-        public ToolboxProject Project { get; set; }
+        public ToolboxProject Project { get; private set; }
         public JsonTab SelectedTab { get; private set; }
         public JetFile Jet { get; private set; }
 
         public JetModView()
         {
             InitializeComponent();
+
+            //GameBackup backup = new GameBackup(Project.Game);
+            
         }
 
         public JetModView(ToolboxProject project) : this()
         {
             Project = project;
 
-            Jet = new JetFile(@"F:\Program Files (x86)\Steam\steamapps\common\BloonsTD5\Assets\BTD5.jet");
-            Jet.Password = project.JetProject.LastJetPassword;
+            var jetView = CreateJetView();
+            if (jetView == null)
+                return;
 
-            var jetView = new JetView(Jet);
+
             jetView.OnItemSelected = new Action<JetViewItem>(JetItemSelected);
             fileTree.Items.AddRange(jetView.Items);
         }
@@ -49,7 +59,7 @@ namespace BTDToolbox.Wpf.Views
             SelectTab(filePath);
         }
 
-        public void OpenFile(ZipEntry entry)
+        public void OpenFile(ZipEntry entry, ZipFile containingZip)
         {
             string path = entry.Name.TrimEnd('/');
             if (SelectTab(path))
@@ -57,7 +67,7 @@ namespace BTDToolbox.Wpf.Views
 
             var tab = new JsonTab();
             tab.ModView = this;
-            tab.OpenFile(entry);
+            tab.OpenFile(entry, containingZip);
             jsonTabControl.Items.Add(tab);
             SelectTab(path);
         }
@@ -89,10 +99,62 @@ namespace BTDToolbox.Wpf.Views
             return tabs;
         }
 
+        private JetView CreateJetView()
+        {
+            string gameDir = Settings.Instance.GetGameInfo(Project.Game).GamePath;
+            if (string.IsNullOrEmpty(gameDir))
+                return null;
+
+            if (Project.Game != GameType.BloonsTDB2)
+            {
+                Popup.Show($"{Project.Game} is not currently supported. You will now be returned to the Main Menu", "Notice",
+                    new PopupAction(() =>
+                    {
+                        new StartupWindow().Show();
+                        MainWindow.Instance.Close();
+                    }));
+
+                return null;
+
+                // previous code
+                /*Jet = new JetFile(@"F:\Program Files (x86)\Steam\steamapps\common\BloonsTD5\Assets\BTD5.jet");
+                Jet.Password = Project.JetProject.LastJetPassword;
+                return new JetView(Jet);*/
+            }
+
+            
+
+            string dirToAdd = $"{gameDir}\\game_data";
+            Battles2JetView jetView = new Battles2JetView(this);
+            jetView.AddDirectory(dirToAdd);
+            return jetView;
+        }
+
         private void JetItemSelected(JetViewItem item)
         {
-            var entry = Jet.FirstOrDefault(entry => entry.Name.TrimEnd('/') == item.FilePath);
-            OpenFile(entry);
+            if (item == null || item.isDirectory)
+                return;            
+
+            if (Project.Game == GameType.BloonsTDB2)
+            {
+                if (item.ContainingJet != null && item.Entry != null)
+                {
+                    OpenFile(item.Entry, item.ContainingJet);
+                }
+                else
+                {
+                    if (BinEncryption.IsEncrypted(item.FilePath))
+                        BinEncryption.DecryptFile(item.FilePath, true);
+
+                    OpenFile(item.FilePath);
+                }
+            }
+            else
+            {
+                // worry about this later when adding other games.
+                /*if (item.Entry != null)
+                    OpenFile(item.Entry);*/
+            }            
         }
 
         private void UserControl_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -119,6 +181,23 @@ namespace BTDToolbox.Wpf.Views
             {
                 GetAllTabs().ForEach(tab => tab.Save());
             }
+        }
+
+        public void TryCloseTab(JsonTab jsonTab)
+        {
+            if (!jsonTab.HasUnsavedChanges)
+            {
+                CloseTab(jsonTab);
+            }
+            else
+            {
+                Popup.Show("There are unsaved changes to this tab. Are you sure you want to close?", "Are you sure?", () => CloseTab(jsonTab), null);
+            }
+        }
+
+        private void CloseTab(JsonTab jsonTab)
+        {
+            jsonTabControl.Items.Remove(jsonTab);
         }
     }
 }

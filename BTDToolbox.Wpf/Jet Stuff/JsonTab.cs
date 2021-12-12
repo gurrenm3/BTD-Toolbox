@@ -1,10 +1,15 @@
-﻿using BTDToolbox.Wpf.Views;
+﻿using BTDToolbox.Lib;
+using BTDToolbox.Wpf.Views;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.SharpZipLib.Zip;
-using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace BTDToolbox.Wpf
 {
@@ -28,9 +33,9 @@ namespace BTDToolbox.Wpf
             OpenFile(filePath);
         }
 
-        public JsonTab(ZipEntry entry) : this()
+        public JsonTab(ZipEntry entry, ZipFile containingZip) : this()
         {
-            OpenFile(entry);
+            OpenFile(entry, containingZip);
         }
 
         public void OpenFile(string filePath)
@@ -41,33 +46,59 @@ namespace BTDToolbox.Wpf
             var headerControl = new HeaderedContentControl();
             headerControl.Content = fileInfo.Name;
             headerControl.ToolTip = fileInfo.FullName;
+            headerControl.MouseDown += HeaderControl_MouseDown;
             Header = headerControl;
 
             Editor = CreateEditor();
             Editor.TextChanged += Editor_TextChanged;
 
             string json = Encoding.UTF8.GetString(File.ReadAllBytes(filePath));
+            json = JValue.Parse(json).ToString(Formatting.Indented);
             Editor.Text = json;
             lastSavedText = json;
             Content = Editor;
             SetUnsavedChanges();
         }
 
-        public void OpenFile(ZipEntry entry)
+        private void HeaderControl_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Middle)
+            {
+                CloseTab();
+            }
+        }
+
+        public void OpenFile(ZipEntry entry, ZipFile containingZip)
         {
             FilePath = entry.Name.TrimEnd('/');
 
             var headerControl = new HeaderedContentControl();
             headerControl.Content = FilePath.Split('/').Last();
             headerControl.ToolTip = FilePath;
+            headerControl.MouseDown += HeaderControl_MouseDown;
             Header = headerControl;
 
             Editor = CreateEditor();
             Editor.TextChanged += Editor_TextChanged;
 
-            var stream = ModView.Jet.GetInputStream(entry);
-            StreamReader reader = new StreamReader(stream);
-            string json = reader.ReadToEnd();
+            string json = "";
+            if (BinEncryption.IsEncrypted(containingZip, entry))
+            {
+                json = BinEncryption.DecryptFile(containingZip, entry);
+            }
+            else
+            {
+                var stream = containingZip.GetInputStream(entry);
+                using var reader = new StreamReader(stream);
+                json = reader.ReadToEnd();
+            }
+
+            if (string.IsNullOrEmpty(json))
+                return;
+
+            // this line auto formats json
+            try { json = JValue.Parse(json).ToString(Formatting.Indented); }
+            catch {  }
 
             Editor.Text = json;
             lastSavedText = json;
@@ -86,16 +117,41 @@ namespace BTDToolbox.Wpf
             editor.Options.EnableHyperlinks = true;
             editor.Options.HighlightCurrentLine = true;
 
-            editor.InstallFoldingMgr();            
-            editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinition("Json");
+            editor.InstallFoldingMgr();
+
+            
+            using var xmlReader = new System.Xml.XmlTextReader(GetHighlightDefStream());
+            editor.SyntaxHighlighting = HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
+
+            editor.Background = FindResource("backgroundColor") as SolidColorBrush;
+            editor.Foreground = FindResource("foregroundColor") as SolidColorBrush;
 
             return editor;
+        }
+
+        private MemoryStream GetHighlightDefStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.Write(Properties.Resources.BJson);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
         }
 
         private async void Editor_TextChanged(object sender, System.EventArgs e)
         {
             SetUnsavedChanges();
-            await Editor.UpdateFoldingsAsync();
+            try
+            {
+                await Editor.UpdateFoldingsAsync();
+            }
+            catch (System.Exception)
+            {
+                Popup.ShowError("Can't open this file!");
+                CloseTab();
+            }
         }
 
         private void SetUnsavedChanges()
@@ -107,6 +163,11 @@ namespace BTDToolbox.Wpf
             }
             else
                 TabHeader.Content = TabHeader.Content.ToString().TrimEnd('*').Trim();
+        }
+
+        public void CloseTab()
+        {
+            ModView.TryCloseTab(this);            
         }
 
         public void Save()

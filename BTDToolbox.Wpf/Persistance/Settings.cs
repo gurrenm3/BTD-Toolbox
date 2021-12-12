@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace BTDToolbox.Wpf.Persistance
 {
-    public class Settings : Lib.Persistance.Settings
+    public class Settings : Lib.Settings
     {
+
     }
 }

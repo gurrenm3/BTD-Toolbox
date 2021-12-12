@@ -4,13 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BTDToolbox.Wpf.Views"
+             Foreground="{StaticResource foregroundColor}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
@@ -22,15 +25,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Create a new project" Foreground="{StaticResource foregroundColor}" FontSize="35" Margin="50,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Rectangle Grid.ColumnSpan="5" Grid.RowSpan="2" Fill="{StaticResource backgroundColor3}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="Create a new project" Foreground="{StaticResource foregroundColor}" FontSize="35" Margin="50,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-        <TextBlock Grid.Row="2" Text="Game:" Foreground="{StaticResource foregroundColor}" FontSize="18" Margin="0,0,0,40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <ListBox x:Name="gameTypesLB" Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" Margin="0,50,0,0" SelectionChanged="gameTypesLB_SelectionChanged"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Game:" Foreground="{StaticResource foregroundColor}" FontSize="18" Margin="0,0,0,40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <ListBox x:Name="gameTypesLB" Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" Margin="0,50,0,0" SelectionChanged="gameTypesLB_SelectionChanged"/>
 
-        <ListBox x:Name="projTypesLB" Grid.Row="2" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="150,20,0,0" SelectionMode="Multiple"/>
+        <ListBox x:Name="projTypesLB" Grid.Row="2" Grid.RowSpan="4" Grid.Column="2" Grid.ColumnSpan="2" Margin="150,20,0,0" SelectionMode="Multiple"/>
 
 
-        <Grid Grid.Row="6" Grid.Column="2">
+        <Grid Grid.Row="6" Grid.Column="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -48,7 +52,7 @@
         </Grid>
 
 
-        <Grid x:Name="projTextBoxes_Grid" Grid.Row="5" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,20,0">
+        <Grid x:Name="projTextBoxes_Grid" Grid.Row="5" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,20,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

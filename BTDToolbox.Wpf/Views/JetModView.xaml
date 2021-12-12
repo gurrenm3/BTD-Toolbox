@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:BTDToolbox.Wpf.Views"
              mc:Ignorable="d"
              PreviewKeyDown="UserControl_PreviewKeyDown"
+             Background="{StaticResource backgroundColor2}"
              PreviewMouseWheel="UserControl_PreviewMouseWheel"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -22,8 +23,9 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
+        <Rectangle Grid.ColumnSpan="5" Fill="#FF1E1E1E"/>
         <TreeView x:Name="fileTree" Grid.Row="1"/>
-        <TabControl x:Name="jsonTabControl" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="2"/>
+        <TabControl x:Name="jsonTabControl" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="2" Background="{StaticResource backgroundColor}" BorderBrush="#FF464646" Foreground="#FFFFB575"/>
         <GridSplitter Grid.Column="0" Grid.Row="1" ResizeDirection="Columns" DragIncrement="5" Width="3" Background="#FF383434"/>
     </Grid>
 </UserControl>

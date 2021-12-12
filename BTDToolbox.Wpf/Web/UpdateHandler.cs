@@ -38,8 +38,7 @@ namespace BTDToolbox.Wpf.Web
                     }
                 });
 
-                Popup.Show("An update is available for BTD Toolbox! Do you want to download it?",
-                    onYesClicked, null, "An Update is Available!");
+                Popup.Show("An update is available for BTD Toolbox! Do you want to download it?", "An Update is Available!", onYesClicked, null);
             }
             catch (Exception)
             {

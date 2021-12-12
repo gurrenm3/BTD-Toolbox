@@ -1,12 +1,22 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using BTDToolbox.Lib;
+using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BTDToolbox.Extensions
 {
     public static class ZipFileExtensions
     {
 
+        public static HashSet<string> GetAllDirectories(this ZipFile zipFile)
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (ZipEntry entry in zipFile)
+                result.Add(entry.GetDirectory());
+
+            return result;
+        }
 
         public static void ForEach(this ZipFile zipFile, Action<ZipEntry> action)
         {

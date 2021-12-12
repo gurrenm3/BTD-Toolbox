@@ -7,6 +7,8 @@
         xmlns:views="clr-namespace:BTDToolbox.Wpf.Views"
         xmlns:local="clr-namespace:BTDToolbox.Wpf.Windows"
         mc:Ignorable="d"
+        Background="{StaticResource backgroundColor}"
+        Foreground="{StaticResource foregroundColor}"
         ContentRendered="Window_ContentRendered"
         WindowStartupLocation="CenterScreen"
         Title="BTD Toolbox" Height="550" Width="800">

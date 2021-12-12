@@ -1,4 +1,4 @@
-namespace BTDToolbox.Lib.Enums
+namespace BTDToolbox.Lib
 {
 	public enum GameType
 	{

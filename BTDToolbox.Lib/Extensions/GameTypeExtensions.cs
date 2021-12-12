@@ -1,4 +1,4 @@
-﻿using BTDToolbox.Lib.Enums;
+﻿using BTDToolbox.Lib;
 
 namespace BTDToolbox.Extensions
 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 
@@ -20,6 +21,18 @@ namespace BTDToolbox.Extensions
                 collectionToAdd.RemoveAt(i);
                 itemCollection.Add(item);
             }
+        }
+
+        public static void ForEach(this ItemCollection itemCollection, Action<object> codeToRun)
+        {
+            for (int i = 0; i < itemCollection.Count; i++)
+                codeToRun.Invoke(itemCollection.GetItemAt(i));
+        }
+
+        public static void ForEach<T>(this ItemCollection itemCollection, Action<T> codeToRun)
+        {
+            for (int i = 0; i < itemCollection.Count; i++)
+                codeToRun.Invoke((T)itemCollection.GetItemAt(i));
         }
     }
 }

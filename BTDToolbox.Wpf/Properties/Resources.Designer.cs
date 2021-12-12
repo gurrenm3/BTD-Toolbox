@@ -19,7 +19,7 @@ namespace BTDToolbox.Wpf.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,34 @@ namespace BTDToolbox.Wpf.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;!-- syntaxdefinition for Json by alek kowalczyk --&gt;
+        ///&lt;SyntaxDefinition name=&quot;Json&quot; extensions=&quot;.json&quot; xmlns=&quot;http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008&quot;&gt;
+        ///    &lt;Color name=&quot;Digits&quot; foreground=&quot;#7F7FFF&quot; exampleText=&quot;3.14&quot; /&gt;
+        ///    &lt;Color name=&quot;Value&quot; foreground=&quot;#7FFF7F&quot; /&gt;
+        ///    &lt;Color name=&quot;ParamName&quot; foreground=&quot;#FF7F7F&quot; /&gt;
+        ///    &lt;RuleSet ignoreCase=&quot;false&quot;&gt;
+        ///        &lt;Keywords color=&quot;Digits&quot; &gt;
+        ///            &lt;Word&gt;true&lt;/Word&gt;
+        ///            &lt;Word&gt;false&lt;/Wor [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BJson {
+            get {
+                return ResourceManager.GetString("BJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap folder {
+            get {
+                object obj = ResourceManager.GetObject("folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
