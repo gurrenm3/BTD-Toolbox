@@ -42,9 +42,7 @@ public partial class NewProjectView : UserControl
         gameTypesLB.Items.Clear();
         Enum.GetValues<GameType>().Where(game => game != GameType.None && IsGameSupported(game)).ForEach(game =>
         {
-            ListBoxItem item = new ListBoxItem();
-            item.Content = game.ToString();
-            gameTypesLB.Items.Add(item);
+            gameTypesLB.Items.Add(new ListBoxItem() { Content = game.ToString() });
         });
     }
 
@@ -81,9 +79,7 @@ public partial class NewProjectView : UserControl
         projTypesLB.Items.Clear();
         supportedProjectTypes.Where(proj => proj.Games.Contains(selectedGame)).ForEach(proj =>
         {
-            ListBoxItem item = new ListBoxItem();
-            item.Content = proj.ItemName;
-            projTypesLB.Items.Add(item);
+            projTypesLB.Items.Add(new ListBoxItem() { Content = proj.ItemName});
         });
     }
 
@@ -223,9 +219,7 @@ public partial class NewProjectView : UserControl
 
         if (GetSelectedMod() == ModType.Jet)
         {
-            JetMod mod = new JetMod();
-            mod.LastJetPassword = jetPass_TextBox.Text;
-            project.JetProject = mod;
+            project.JetProject = new JetMod() { LastJetPassword = jetPass_TextBox.Text };
         }
 
         project.SaveToFile();

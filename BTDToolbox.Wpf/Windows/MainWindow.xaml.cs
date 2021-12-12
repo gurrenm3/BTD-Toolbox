@@ -7,7 +7,8 @@ using System.Windows;
 using BTDToolbox.Lib;
 using System.IO;
 using System;
-
+using System.Windows.Media.Converters;
+using System.Diagnostics;
 
 namespace BTDToolbox.Wpf.Windows
 {
@@ -53,14 +54,13 @@ namespace BTDToolbox.Wpf.Windows
                 case Lib.Enums.ModType.Jet:
                     tab.Content = new JetModView(Project);
                     break;
-                case Lib.Enums.ModType.Map:
+                case Lib.Enums.ModType.Map: // not setup yet
                     break;
                 default:
                     break;
             }
 
-            modsTabControl.Items.Add(tab);
-            modsTabControl.SelectedIndex = modsTabControl.Items.Count - 1;
+            modsTabControl.SelectedIndex = modsTabControl.Items.Add(tab);
         }
 
         /// <summary>
@@ -73,12 +73,15 @@ namespace BTDToolbox.Wpf.Windows
             bool isEverythingOkay = await RunToolboxChecks();
             if (!isEverythingOkay)
             {
+                await Popup.Show("Toolbox was unable to get some information that is crucial to running properly." +
+                    " As a result you will be returned to the Welcome Screen...", "Failed To Load Properly");
+
                 ReturnToMainMenu();
-                return; // check if this return statement is needed since we closed already.
+                return;
             }
 
             OpenMod(Project.JetProject);
-            this.Visibility = Visibility.Visible;
+            Visibility = Visibility.Visible;
         }
 
         /// <summary>
@@ -102,7 +105,7 @@ namespace BTDToolbox.Wpf.Windows
             // Toolbox project is bad.
             if (Project == null)
             {
-                await Popup.Show("Toolbox project was null/invalid when trying to load into the program. Returning to the Main Menu...", 
+                await Popup.Show("Toolbox project was null/invalid when trying to load into the program.", 
                     "Project was null");
                 return false;
             }
@@ -111,36 +114,66 @@ namespace BTDToolbox.Wpf.Windows
             var gameInfo = Settings.Instance?.GetGameInfo(Project.Game);
             if (gameInfo == null)
             {
-                await Popup.Show($"Toolbox encountered an unknown error. Failed to get game info for {Project.Game}. Returning to the Main Menu..."
-                    , "Unknown error occured.");
+                await Popup.Show($"Toolbox encountered an unknown error. Failed to get game info for {Project.Game}.",
+                    "Unknown error occured.");
                 return false;
             }
 
             // Game directory not set.
             if (!gameInfo.IsGameDirValid())
             {
-                bool success = true;
-                string path = "";
                 await Popup.Show($"You have not set the path for {gameInfo.Game}. Toolbox needs to know the game path to run properly." +
-                    $" Please select the path for {gameInfo.Game}'s EXE file. It's in the same folder that you installed the game to.",
-                    $"Browse for {gameInfo.Game}", async () =>
+               $" Please select the path for {gameInfo.Game}'s EXE file. It's in the same folder that you installed the game to.", 
+               $"Browse for {gameInfo.Game}");
+
+                if (!await BrowseForGamePath(gameInfo))
+                {
+                    bool success = false;
+                    while (true)
                     {
-                        path = gameInfo.BrowseForGamePath();
-                        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                        bool tryAgain = true;
+                        await Popup.Show("Would you like to try setting the path again?", "Try Again?", null, () => { tryAgain = false; });
+                        if (!tryAgain) break;
+
+                        if (await BrowseForGamePath(gameInfo))
                         {
-                            await Popup.Show("You did not select the game path or it was invalid. Toolbox is unable to work properly" +
-                                " without having the game's directory, therefore you will be returned to the Main Menu.");
-                            success = false;
+                            success = true;
+                            break;
                         }
-                    });
+                    }
 
-                if (!success)
-                    return false;
-
-                gameInfo.GamePath = new FileInfo(path).DirectoryName;
-                Settings.Instance.Save();
+                    if (!success) return false;
+                }
             }
 
+            return true;
+        }
+
+        /// <summary>
+        /// Used to actually browse for the game's path. Also shows Popup errors if there are issues with the path selected.
+        /// </summary>
+        /// <param name="gameInfo"></param>
+        /// <returns></returns>
+        private async Task<bool> BrowseForGamePath(GameInfo gameInfo)
+        {
+            string path = gameInfo.BrowseForGamePath();
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                await Popup.Show("You did not select the game path or it was invalid. " +
+                    "Toolbox can't work properly without having the game's directory", "Bad Path Selected");
+                return false;
+            }
+
+            if (!path.TrimEnd('/').TrimEnd('\\').EndsWith(GameInfo.gameExeNames[gameInfo.Game]))
+            {
+                await Popup.Show($"You did not select the correct EXE file for {gameInfo.Game}. " +
+                    $"Please select an EXE file named \"{GameInfo.gameExeNames[gameInfo.Game]}\"", "Wrong EXE Selected");
+                return false;
+            }
+
+            gameInfo.GamePath = new FileInfo(path).DirectoryName;
+            Settings.Instance.Save();
+            await Popup.Show($"{gameInfo.Game} path was successfully set to \"{gameInfo.GamePath}\"", "Success");
             return true;
         }
 

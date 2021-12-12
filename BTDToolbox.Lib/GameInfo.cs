@@ -10,7 +10,7 @@ namespace BTDToolbox.Lib
         /// <summary>
         /// Contains the EXE name for each game.
         /// </summary>
-        readonly static Dictionary<GameType, string> gameExeNames = new Dictionary<GameType, string>() 
+        public static readonly Dictionary<GameType, string> gameExeNames = new Dictionary<GameType, string>() 
         {
             { GameType.BloonsAT, "btdadventuretime.exe" }, 
             { GameType.BloonsMC, "MonkeyCity-Win.exe" },

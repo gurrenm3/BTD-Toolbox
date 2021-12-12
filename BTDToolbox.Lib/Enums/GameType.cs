@@ -5,6 +5,6 @@ namespace BTDToolbox.Lib
 	/// </summary>
 	public enum GameType
 	{
-		None, BloonsTD6, BloonsTD5, BloonsTDB, BloonsTDB2, BloonsMC, BloonsAT
+		None, BloonsTDB2, BloonsTD6, BloonsTD5, BloonsTDB, BloonsMC, BloonsAT
 	}
 }

@@ -128,10 +128,10 @@ namespace BTDToolbox.Wpf
                 return;
             }
 
+            runningPopups = true;
             var popup = queuedPopups.Dequeue();
             popup.ShowPopup();
             popup.popupAction.OnAnyButtonPressed.Add(() => popup.popupButtonPressed = true);
-            runningPopups = true;
             await popup.WaitForClose();
         }
     }
