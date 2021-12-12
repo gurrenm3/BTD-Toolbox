@@ -25,7 +25,7 @@ namespace BTDToolbox.Wpf.Web
             {
                 var releaseInfo = await updateChecker.GetReleaseInfoAsync();
                 var latestRelease = releaseInfo[0];
-                bool isUpdate = updateChecker.IsUpdate(MainWindow.versionNumber, latestRelease);
+                bool isUpdate = updateChecker.IsUpdate(ToolboxData.versionNumber, latestRelease);
                 if (!isUpdate)
                     return;
 

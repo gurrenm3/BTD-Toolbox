@@ -28,18 +28,10 @@ namespace BTDToolbox.Lib
 
         public void TryGetAllGameDirs()
         {
-            /* Enum.GetValues<GameType>().Where(game => game != GameType.None).ForEach(game =>
-             {
-                 AllGameInfo.Add(new GameInfo() { Game = game, GamePath = SteamUtils.GetGameDir(game) });
-             });*/
-
-            foreach (var game in Enum.GetValues<GameType>())
+            Enum.GetValues<GameType>().Where(game => game != GameType.None).ForEach(game =>
             {
-                if (game == GameType.None)
-                    continue;
-
                 AllGameInfo.Add(new GameInfo(game) { GamePath = SteamUtils.GetGameDir(game) });
-            }
+            });
         }
 
         public GameInfo GetGameInfo(GameType selectedGame)
@@ -51,7 +43,7 @@ namespace BTDToolbox.Lib
 
         public void Save(string filePath)
         {
-            var json = JsonSerializer.Serialize<Settings>(this, new JsonSerializerOptions() { WriteIndented = true });
+            var json = JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true });
             new FileInfo(filePath).Directory.Create();
             File.WriteAllBytes(filePath, Encoding.UTF8.GetBytes(json));
         }

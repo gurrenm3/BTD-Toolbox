@@ -16,8 +16,6 @@ namespace BTDToolbox.Wpf.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly string versionNumber = "0.0.1";
-
         /// <summary>
         /// Instance of the currently opened Main Window.
         /// </summary>

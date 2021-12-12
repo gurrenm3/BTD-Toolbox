@@ -92,17 +92,17 @@ namespace BTDToolbox.Wpf
         }
 
 
-        public static void ShowWarning(string message) => ShowWarning(message, new PopupAction());
-        public static void ShowWarning(string message, PopupAction popupAction)
+        public static async Task ShowWarning(string message) => await ShowWarning(message, new PopupAction());
+        public static async Task ShowWarning(string message, PopupAction popupAction)
         {
-            Show(message, "Warning", popupAction);
+            await Show(message, "Warning", popupAction);
         }
 
 
-        public static void ShowError(string message) => ShowError(message, new PopupAction());
-        public static void ShowError(string message, PopupAction popupAction)
+        public static async Task ShowError(string message) => await ShowError(message, new PopupAction());
+        public static async Task ShowError(string message, PopupAction popupAction)
         {
-            Show(message, "Error", popupAction);
+            await Show(message, "Error", popupAction);
         }
 
         public static async Task Show(string message) => await Show(message, "", new PopupAction());

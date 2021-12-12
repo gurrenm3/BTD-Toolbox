@@ -6,7 +6,7 @@ namespace BTDToolbox.Extensions
     {
         public static bool HasJetFile(this GameType gameType)
         {
-            return gameType == GameType.BloonsTDB || gameType == GameType.BloonsMC || gameType == GameType.BloonsTD5;
+            return gameType == GameType.BloonsTDB || gameType == GameType.BloonsMC || gameType == GameType.BloonsTD5 || gameType == GameType.BloonsTDB2;
         }
     }
 }
