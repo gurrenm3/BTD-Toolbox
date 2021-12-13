@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Folding;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace BTDToolbox.Wpf
 {
@@ -10,9 +11,18 @@ namespace BTDToolbox.Wpf
     {
         public FoldingManager FoldingMgr { get; private set; }
 
-        public JsonEditor()
+        public JsonEditor() : base()
         {
-            
+            FontSize = 16;
+            ShowLineNumbers = true;
+            Background = FindResource("backgroundColor") as SolidColorBrush;
+            Foreground = FindResource("foregroundColor") as SolidColorBrush;
+
+            Options.EnableRectangularSelection = true;
+            Options.AllowScrollBelowDocument = true;
+            Options.CutCopyWholeLine = true;
+            Options.EnableHyperlinks = true;
+            Options.HighlightCurrentLine = true;
         }
 
         public void InstallFoldingMgr()

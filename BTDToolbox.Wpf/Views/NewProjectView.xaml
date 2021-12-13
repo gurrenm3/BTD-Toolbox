@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:BTDToolbox.Wpf.Views"
              Foreground="{StaticResource foregroundColor}"
              mc:Ignorable="d" 
+             MouseDown="UserControl_MouseDown"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -72,7 +73,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Project Name" Foreground="{StaticResource foregroundColor}"/>
-                <TextBox x:Name="projName_TextBox" Grid.Row="1" Margin="2" Background="#FF7F7F7F" Foreground="White" CaretBrush="#FFFFBE5D" FontSize="16" FontFamily="Consolas"/>
+                <TextBox x:Name="projName_TextBox" Grid.Row="1" Margin="2" Background="#FF7F7F7F" Foreground="White" CaretBrush="#FFFFBE5D" FontSize="16" FontFamily="Consolas" KeyDown="projName_TextBox_KeyDown"/>
             </Grid>
             <Grid x:Name="projLocation_Grid" Grid.Row="2" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>

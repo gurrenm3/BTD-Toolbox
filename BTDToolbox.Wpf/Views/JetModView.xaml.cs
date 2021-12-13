@@ -14,7 +14,6 @@ using BTDToolbox.Wpf.Windows;
 using BTDToolbox.Wpf.ViewModels;
 using BTDToolbox.Lib.UI;
 using BTDToolbox.Lib;
-using System.Security.Cryptography.X509Certificates;
 
 namespace BTDToolbox.Wpf.Views
 {
@@ -24,7 +23,7 @@ namespace BTDToolbox.Wpf.Views
     public partial class JetModView : UserControl
     {
         public ToolboxProject Project { get; private set; }
-        public JsonTab SelectedTab { get; private set; }
+        public JsonTab SelectedTab { get => (JsonTab)jsonTabControl.SelectedItem; }
         public JetFile Jet { get; private set; }
 
         public JetModView()
@@ -32,7 +31,6 @@ namespace BTDToolbox.Wpf.Views
             InitializeComponent();
 
             //GameBackup backup = new GameBackup(Project.Game);
-            
         }
 
         public JetModView(ToolboxProject project) : this()
@@ -48,43 +46,23 @@ namespace BTDToolbox.Wpf.Views
             fileTree.Items.AddRange(jetView.Items);
         }
 
-        public void OpenFile(string filePath)
+        public void OpenFile(JetViewItem itemToOpen)
         {
-            if (SelectTab(filePath))
+            if (SelectTab(itemToOpen))
                 return;
 
-            var tab = new JsonTab(filePath);
-            tab.ModView = this;
-            jsonTabControl.Items.Add(tab);
-            SelectTab(filePath);
+            var tab = new JsonTab(this, itemToOpen);
+            jsonTabControl.SelectedIndex = jsonTabControl.Items.Add(tab);
         }
 
-        public void OpenFile(ZipEntry entry, ZipFile containingZip)
+        public bool SelectTab(JetViewItem itemToSelect)
         {
-            string path = entry.Name.TrimEnd('/');
-            if (SelectTab(path))
-                return;
+            var foundTab = jsonTabControl.Items.FirstOrDefault<JsonTab>(item => item.currentFile.Equals(itemToSelect));
+            if (foundTab == null)
+                return false;
 
-            var tab = new JsonTab();
-            tab.ModView = this;
-            tab.OpenFile(entry, containingZip);
-            jsonTabControl.Items.Add(tab);
-            SelectTab(path);
-        }
-
-        public bool SelectTab(string filePath)
-        {
-            for (int i = 0; i < jsonTabControl.Items.Count; i++)
-            {
-                var tab = (JsonTab)jsonTabControl.Items[i];
-                if (tab.FilePath != filePath)
-                    continue;
-
-                jsonTabControl.SelectedIndex = i;
-                SelectedTab = tab;
-                return true;
-            }
-            return false;
+            jsonTabControl.SelectedItem = foundTab;
+            return true;
         }
 
         public List<JsonTab> GetAllTabs()
@@ -101,7 +79,7 @@ namespace BTDToolbox.Wpf.Views
 
         private JetView CreateJetView()
         {
-            string gameDir = Settings.Instance.GetGameInfo(Project.Game).GamePath;
+            string gameDir = Settings.Instance.GetGameInfo(Project.Game)?.GamePath;
             if (string.IsNullOrEmpty(gameDir))
                 return null;
 
@@ -123,19 +101,25 @@ namespace BTDToolbox.Wpf.Views
             }
 
             
+            if (Project.Game == GameType.BloonsTDB2)
+            {
+                string dirToAdd = $"{gameDir}\\game_data";
+                Battles2JetView jetView = new Battles2JetView(this);
+                jetView.AddDirectory(dirToAdd);
+                return jetView;
+            }
 
-            string dirToAdd = $"{gameDir}\\game_data";
-            Battles2JetView jetView = new Battles2JetView(this);
-            jetView.AddDirectory(dirToAdd);
-            return jetView;
+            return null;
         }
 
         private void JetItemSelected(JetViewItem item)
         {
             if (item == null || item.isDirectory)
-                return;            
+                return;
 
-            if (Project.Game == GameType.BloonsTDB2)
+            OpenFile(item);
+
+            /*if (Project.Game == GameType.BloonsTDB2)
             {
                 if (item.ContainingJet != null && item.Entry != null)
                 {
@@ -152,9 +136,9 @@ namespace BTDToolbox.Wpf.Views
             else
             {
                 // worry about this later when adding other games.
-                /*if (item.Entry != null)
-                    OpenFile(item.Entry);*/
-            }            
+                *//*if (item.Entry != null)
+                    OpenFile(item.Entry);*//*
+            }*/
         }
 
         private void UserControl_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -166,7 +150,7 @@ namespace BTDToolbox.Wpf.Views
 
                 e.Handled = true;
                 int negativeModifier = e.Delta < 0 ? -1 : 1;
-                SelectedTab.Editor.FontSize += 1 * negativeModifier;
+                SelectedTab.editor.FontSize += 1 * negativeModifier;
             }
         }
 

@@ -37,7 +37,8 @@ public class Battles2JetView : JetView
                 allJetDirectories.Add(dir);
         }
 
-        AddAllJetDirectories(allJetDirectories, assetTree.TreeItem);
+        var orderedDirectories = allJetDirectories.OrderBy(item => item).ToHashSet();
+        AddAllJetDirectories(orderedDirectories, assetTree.TreeItem);
 
         List<JetEntry> jetEntries = new List<JetEntry>();
         foreach (var file in jetFiles)

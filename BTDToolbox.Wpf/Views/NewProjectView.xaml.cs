@@ -151,6 +151,11 @@ public partial class NewProjectView : UserControl
     /// <param name="e"></param>
     private async void create_Button_Click(object sender, RoutedEventArgs e)
     {
+        await TryCreateProject();
+    }
+
+    private async Task TryCreateProject()
+    {
         if (await IsAllInfoProvided() == false)
             return;
 
@@ -165,7 +170,7 @@ public partial class NewProjectView : UserControl
             if (!replaceFile) return;
         }
 
-        var project = CreateProject(filePath);
+        var project = CreateToolboxProject(filePath);
         new MainWindow(project).Show();
         Window.GetWindow(this).Close();
     }
@@ -213,7 +218,7 @@ public partial class NewProjectView : UserControl
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    private ToolboxProject CreateProject(string filePath)
+    private ToolboxProject CreateToolboxProject(string filePath)
     {
         ToolboxProject project = new ToolboxProject(selectedGame, filePath);
 
@@ -227,12 +232,43 @@ public partial class NewProjectView : UserControl
     }
 
     /// <summary>
+    /// Adds ability for user to create project when pressing the enter key.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void projName_TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+            await TryCreateProject();
+    }
+
+    /// <summary>
+    /// Handles logic for taking user back to main menu if they press the back button on their mouse.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void UserControl_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.XButton1 == System.Windows.Input.MouseButtonState.Pressed) // Mouse back button was pressed.
+            ReturnToMainMenu();
+    }
+
+    /// <summary>
     /// Returns whether or not Toolbox currently supports modding this game.
     /// </summary>
     /// <param name="game">Game to check.</param>
     /// <returns>True if game can be modded at all using Toolbox, otherwise false.</returns>
     private bool IsGameSupported(GameType game) => supportedProjectTypes.Any(type => type.Games.Contains(game));
 
-    /// Take user back to Welcome screen
-    private void back_Button_Click(object sender, RoutedEventArgs e) => Window.GetWindow(this).ChangeView<WelcomeViewModel>();
+    /// <summary>
+    /// Calls <see cref="ReturnToMainMenu"/> to take user back to the welcome screen.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void back_Button_Click(object sender, RoutedEventArgs e) => ReturnToMainMenu();
+
+    /// <summary>
+    /// Logic to take user back to the welcome screen.
+    /// </summary>
+    private void ReturnToMainMenu() => Window.GetWindow(this).ChangeView<WelcomeViewModel>();
 }

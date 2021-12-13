@@ -34,5 +34,27 @@ namespace BTDToolbox.Extensions
             for (int i = 0; i < itemCollection.Count; i++)
                 codeToRun.Invoke((T)itemCollection.GetItemAt(i));
         }
+
+        public static T FirstOrDefault<T>(this ItemCollection itemCollection, Func<T, bool> predicate)
+        {
+            for(int i = 0; i < itemCollection.Count; i++)
+            {
+                var item = (T)itemCollection[i];
+                if (predicate(item))
+                    return item;
+            }
+            return default;
+        }
+
+        public static object FirstOrDefault(this ItemCollection itemCollection, Func<object, bool> predicate)
+        {
+            for (int i = 0; i < itemCollection.Count; i++)
+            {
+                var item = itemCollection[i];
+                if (predicate(item))
+                    return item;
+            }
+            return default;
+        }
     }
 }

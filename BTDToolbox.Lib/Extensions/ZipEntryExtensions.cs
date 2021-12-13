@@ -14,5 +14,15 @@ namespace BTDToolbox.Lib
         {
             return Path.GetDirectoryName(entry.Name);
         }
+
+        /// <summary>
+        /// Returns just the name of this entry without it's path included.
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public static string GetFileName(this ZipEntry entry)
+        {
+            return Path.GetFileName(entry.Name);
+        }
     }
 }
